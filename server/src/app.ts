@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import authRoutes from "./routes/auth.routes";
+import expenseRoutes from "./routes/expense.routes";
 import groupRoutes from "./routes/group.routes";
 
 const app = express();
@@ -10,6 +11,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/groups", groupRoutes);
+app.use("/api/expenses", expenseRoutes);
 
 app.get("/", (_req, res) => {
   res.json({
