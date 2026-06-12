@@ -1,5 +1,6 @@
 import Expense from "../models/Expense";
 import ExpenseShare from "../models/ExpenseShare";
+import Group from "../models/Group";
 import GroupMember from "../models/GroupMember";
 
 interface CreateExpensePayload {
@@ -46,19 +47,40 @@ export const createExpenseService = async ({
 };
 
 export const getGroupExpensesService = async (groupId: string) => {
-  return Expense.find({
+  if (!groupId) {
+    throw new Error("Group ID is required");
+  }
+
+  const group = await Group.findById(groupId);
+
+  if (!group) {
+    throw new Error("Group not found");
+  }
+
+  const expenses = await Expense.find({
     groupId,
   })
     .populate("paidBy", "name")
     .sort({
       createdAt: -1,
     });
-};
 
+  return expenses;
+};
 export const getExpenseDetailsService = async (expenseId: string) => {
-  return Expense.findById(expenseId)
+  if (!expenseId) {
+    throw new Error("Expense ID is required");
+  }
+
+  const expense = await Expense.findById(expenseId)
     .populate("paidBy", "name")
     .populate("createdBy", "name");
+
+  if (!expense) {
+    throw new Error("Expense not found");
+  }
+
+  return expense;
 };
 
 export const updateExpenseService = async (

@@ -38,21 +38,35 @@ export const createExpense = async (req: AuthRequest, res: Response) => {
 };
 
 export const getGroupExpenses = async (req: AuthRequest, res: Response) => {
-  const data = await getGroupExpensesService(req.params.groupId as string);
+  try {
+    const data = await getGroupExpensesService(req.params.groupId as string);
 
-  res.json({
-    success: true,
-    data,
-  });
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error: any) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 export const getExpenseDetails = async (req: AuthRequest, res: Response) => {
-  const data = await getExpenseDetailsService(req.params.expenseId as string);
+  try {
+    const data = await getExpenseDetailsService(req.params.expenseId as string);
 
-  res.json({
-    success: true,
-    data,
-  });
+    return res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error: any) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 export const updateExpense = async (req: AuthRequest, res: Response) => {
