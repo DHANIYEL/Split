@@ -1,5 +1,8 @@
+import Expense from "../models/Expense";
+import ExpenseShare from "../models/ExpenseShare";
 import Group from "../models/Group";
 import GroupMember from "../models/GroupMember";
+import User from "../models/User";
 
 interface CreateGroupPayload {
   title: string;
@@ -103,4 +106,67 @@ export const deleteGroupService = async ({
   await Group.findByIdAndDelete(groupId);
 
   return true;
+};
+
+export const getGroupBalancesService = async (groupId: string) => {
+  const expenses = await Expense.find({
+    groupId,
+  });
+
+  const balances: Record<
+    string,
+    {
+      userId: string;
+      name: string;
+      paid: number;
+      share: number;
+      balance: number;
+    }
+  > = {};
+
+  for (const expense of expenses) {
+    const paidBy = expense.paidBy.toString();
+
+    if (!balances[paidBy]) {
+      const user = await User.findById(paidBy);
+
+      balances[paidBy] = {
+        userId: paidBy,
+        name: user?.name || "",
+        paid: 0,
+        share: 0,
+        balance: 0,
+      };
+    }
+
+    balances[paidBy].paid += expense.amount;
+
+    const shares = await ExpenseShare.find({
+      expenseId: expense._id,
+    });
+
+    for (const share of shares) {
+      const userId = share.userId.toString();
+
+      if (!balances[userId]) {
+        const user = await User.findById(userId);
+
+        balances[userId] = {
+          userId,
+          name: user?.name || "",
+          paid: 0,
+          share: 0,
+          balance: 0,
+        };
+      }
+
+      balances[userId].share += share.shareAmount;
+    }
+  }
+
+  Object.keys(balances).forEach((key) => {
+    balances[key].balance = balances[key].paid - balances[key].share;
+  });
+
+  return Object.values(balances);
 };

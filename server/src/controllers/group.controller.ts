@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import {
   createGroupService,
   deleteGroupService,
+  getGroupBalancesService,
   getGroupDetailsService,
   getGroupMembersService,
   getMyGroupsService,
@@ -120,6 +121,24 @@ export const deleteGroup = async (req: AuthRequest, res: Response) => {
     });
   } catch (error: any) {
     res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getGroupBalances = async (req: AuthRequest, res: Response) => {
+  try {
+    const balances = await getGroupBalancesService(
+      req.params.groupId as string,
+    );
+
+    return res.status(200).json({
+      success: true,
+      data: balances,
+    });
+  } catch (error: any) {
+    return res.status(500).json({
       success: false,
       message: error.message,
     });

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createGroup,
   deleteGroup,
+  getGroupBalances,
   getGroupDetails,
   getGroupMembers,
   getMyGroups,
@@ -23,5 +24,7 @@ router.get("/:groupId/members", authMiddleware, getGroupMembers);
 router.put("/:groupId", authMiddleware, updateGroup);
 
 router.delete("/:groupId", authMiddleware, deleteGroup);
+
+router.get("/:groupId/balances", authMiddleware, getGroupBalances);
 
 export default router;
